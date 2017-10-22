@@ -1,28 +1,111 @@
 var express = require('express');
+var path = require('path');
+var mongoose = require('mongoose')
 var port = process.env.PORT || 3000;
+var Movie = require('./models/movie')
+var _ = require('underscore')
 var app = express();
 
-app.set('views', './views');
+mongoose.connect('mongodb://localhost/imooc')
+
+app.set('views', './views/pages');
 app.set('view engine', 'jade');
+app.use(require('body-parser').urlencoded({extended: true}));
+app.use(express.static(path.join(__dirname, 'bower_commpnents')))
 app.listen(port);
 
 // inde path
 app.get('/', function(req, res){
-  res.render('index', {
-    title: 'imooc 首页'
-  })
+  Movie.fetch(function(err, movies) {
+        if (err) {
+            console.log(err)
+        }
+        res.render('index', {
+            title: '爱电影 首页',
+            movies: movies
+        })
+    })
 })
 // inde path
 app.get('/movie/:id', function(req, res){
-  res.render('detail', {
-    title: 'imooc 详情页'
-  })
+  var id = req。params.id
+  if(id) {
+        Movie.findById(id, function(err, movie) {
+            if(err) {
+                console.log(err)
+            }
+            res.render('admin', {
+                title: '爱电影 后台更新页',
+                movie: movie
+            })
+        })
+    }
+})
+
+// admin update movie
+app.get('/admin/update/:id', function(req, res) {
+    var id = req.params.id
+
+    if(id) {
+        Movie.findById(id, function(err, movie) {
+            if(err) {
+                console.log(err)
+            }
+            res.render('admin', {
+                title: '爱电影 后台更新页',
+                movie: movie
+            })
+        })
+    }
+})
+
+app.post('./admin/movie/new', function(res, req) {
+  var id = res.body.movie._id
+  var movieObj = res.body.movie
+  var _movie
+  if (id !== 'undefined') {
+    Movie.findById(id, function(err, movie) {
+      if (err) {
+        console.log(err)
+      }
+      _movie = _.extend(movie, movieObj)
+      _movie.save(function(err, movie) {
+        if (err) {
+          console.log(err)
+        }
+        res.redirect('/movie/' + movie._id)
+      })
+    })
+  } else {
+    _movie = new Movie({
+      doctor: movieObj.doctor,
+      title: movieObj.title,
+      country: movieObj.country,
+      language: movieObj.language,
+      year: movieObj.year,
+      poster: movieObj.poster,
+      summary: movieObj.summary,
+      flash: movieObj.flash
+    })
+    _movie.save(function(err, movie) {
+      if (err) {
+        console.log(err)
+      }
+      res.redirect('/movie/' + movie._id)
+    })
+  }
 })
 // inde path
 app.get('/admin/list', function(req, res){
-  res.render('list', {
-    title: 'imooc 列表页'
-  })
+  Movie.fetch(function(err, movies) {
+        if(err) {
+            console.log(err)
+        }
+        res.render('list', {
+            title: '爱电影 列表页',
+            movies: movies
+        })
+    })
 })
 // inde path
 app.get('/admin/movie', function(req, res){
