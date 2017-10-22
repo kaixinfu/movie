@@ -1,0 +1,32 @@
+var express = require('express');
+var port = process.env.PORT || 3000;
+var app = express();
+
+app.set('views', './views');
+app.set('view engine', 'jade');
+app.listen(port);
+
+// inde path
+app.get('/', function(req, res){
+  res.render('index', {
+    title: 'imooc 首页'
+  })
+})
+// inde path
+app.get('/movie/:id', function(req, res){
+  res.render('detail', {
+    title: 'imooc 详情页'
+  })
+})
+// inde path
+app.get('/admin/list', function(req, res){
+  res.render('list', {
+    title: 'imooc 列表页'
+  })
+})
+// inde path
+app.get('/admin/movie', function(req, res){
+  res.render('admin', {
+    title: 'imooc 后台录入页'
+  })
+})
