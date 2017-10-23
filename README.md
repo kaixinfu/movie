@@ -16,6 +16,17 @@
 
 > `npm install`
 
+## mongodb
+
+> `下载连接mongodb`
+
+> `连接mongodb：$ mongod --config /usr/local/etc/mongod.conf`
+
+
+> `连接不上请查看：/usr/local/var/log/mongodb/mongo.log 日志`
+
+> `$ mongo`
+
 ## Dev
 
-> `npm start`
+> `npm app.js`
